@@ -15,9 +15,10 @@ if (!Validator::validateOrderId($_GET['OrderId'])) {
 
 session_start();
 
-$_SESSION['secret'] = md5(rand(0, 1000).rand());//
+$_SESSION['keyCsrfToken'] = md5(rand(0, 1000).rand());
+$_SESSION['keyHmac'] = md5(rand(0, 1000).rand());
 $salt = rand(0, 1000);
-$token = hash('sha256', $salt.$_SESSION['secret']);
+$token = hash('sha256', $salt.$_SESSION['keyCsrfToken']);
 
 echo <<<HTML
 <script type="text/javascript" src="hmac-sha256.js"></script>
@@ -27,13 +28,19 @@ function send(){
     var orderId = document.payment.OrderId.value;
     var token = document.payment.token.value;
     var data = amount.toString()+orderId.toString()+token;
-    var HMAC = CryptoJS.HmacSHA256(data , "Key");
+    
+    var key = document.payment.Key.value;
+    document.payment.Key.value = "";
+    
+    var HMAC = CryptoJS.HmacSHA256(data , key);
     document.payment.HMAC.value = HMAC;
 }
 </script>
 
+<p>Вы получили по телефону SMS с кодом $_SESSION[keyHmac]</p>
 <form name="payment" action="result.php" method="post" onsubmit="return send()">
     <p>Amount: <input type="text" name="Amount" required/></p>
+    <p>Key: <input type="password" name="Key" required></p>
     <p><input type="hidden" name="HMAC" /></p>
     <p><input type="hidden" name="OrderId" value=$_GET[OrderId] />
     <p><input type="hidden" name="token" value=$salt:$token></p>
