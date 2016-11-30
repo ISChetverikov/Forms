@@ -1,6 +1,6 @@
 <?php
 /**
- * Форма, необходимая для ввода необходимой суммы, а также код подтверждения
+ * Форма, необходимая для ввода необходимой суммы, а также ключ подтверждения
  * 
  * При обращении к скипту формы необходим GET-параметр OrderId, являющийся 
  * положительным целым числом.
@@ -8,7 +8,7 @@
  * Форма защищена от подмены отправляемых данных добавкой HMAC. 
  * Ключ, используемый для вычисления HMAC, также генерируется сервером.
  * Ключи сохраняются в сессию.
- * Код подтверждения выведен на страницу как имитация получения его по SMS,
+ * Ключ подтверждения выведен на страницу как имитация получения его по SMS,
  * его необходимо ввести в поле Key.
  *
  * PHP version 7
@@ -65,11 +65,11 @@ function send(){
 }
 </script>
 
-<p>Вы получили по телефону SMS с кодом $_SESSION[keyHmac]</p>
+<p>Вы получили по телефону SMS с ключом $_SESSION[keyHmac]</p>
 <p>Введите его в поле Key</p>
 <form name="payment" action="result.php" method="post" onsubmit="return send()">
     <p>Amount: <input type="text" name="Amount" required/></p>
-    <p>Key: <input type="password" name="Key" required></p>
+    <p>Ключ подтверждения: <input type="password" name="Key" required></p>
     <p><input type="hidden" name="HMAC" /></p>
     <p><input type="hidden" name="OrderId" value=$_GET[OrderId] />
     <p><input type="hidden" name="token" value=$salt:$token></p>
