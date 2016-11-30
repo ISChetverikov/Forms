@@ -15,9 +15,9 @@ if (!Validator::validateOrderId($_GET['OrderId'])) {
 
 session_start();
 
-$_SESSION['keyCsrfToken'] = md5(rand(0, 1000).rand());
-$_SESSION['keyHmac'] = md5(rand(0, 1000).rand());
-$salt = rand(0, 1000);
+$_SESSION['keyCsrfToken'] = md5(uniqid(rand(),true));
+$_SESSION['keyHmac'] = md5(uniqid(rand(),true));
+$salt = rand(0, 1024);
 $token = hash('sha256', $salt.$_SESSION['keyCsrfToken']);
 
 echo <<<HTML
@@ -38,6 +38,7 @@ function send(){
 </script>
 
 <p>Вы получили по телефону SMS с кодом $_SESSION[keyHmac]</p>
+<p>Введите его в поле Key</p>
 <form name="payment" action="result.php" method="post" onsubmit="return send()">
     <p>Amount: <input type="text" name="Amount" required/></p>
     <p>Key: <input type="password" name="Key" required></p>
