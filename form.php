@@ -16,8 +16,9 @@ if (!Validator::validateOrderId($_GET['OrderId'])) {
 session_start();
 
 $_SESSION['keyCsrfToken'] = md5(uniqid(rand(),true));
-$_SESSION['keyHmac'] = md5(uniqid(rand(),true));
-$salt = rand(0, 1024);
+$_SESSION['keyHmac'] = substr(md5(uniqid(rand(),true)),0,8);
+
+$salt = substr(md5(uniqid(rand(),true)),0,8);
 $token = hash('sha256', $salt.$_SESSION['keyCsrfToken']);
 
 echo <<<HTML
