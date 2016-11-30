@@ -43,13 +43,14 @@ $token = hash('sha256', $salt.$_SESSION['keyCsrfToken']);
 /*
  * Генерация ключа HMAC
  */
-$_SESSION['keyHmac'] = substr(md5(uniqid(rand(), true)), 0, 8);
+$_SESSION['keyHmac'] = substr(md5(uniqid(rand(), true)), 0, 16);
 
 /*
- * Страница с формой и JavaScript кодом для формирования HMAC на стороне клиента
+ * Страница с формой и JavaScript кодом для формирования HMAC на стороне клиента.
+ * Введенный ключ подтверждения не передается срерверу
  */
 echo <<<HTML
-<script type="text/javascript" src="hmac-sha256.js"></script>
+<script type="text/javascript" src="js\hmac-sha256.js"></script>
 <script type="text/javascript">
 function send(){
     var amount = document.payment.Amount.value; 
@@ -73,7 +74,7 @@ function send(){
     <p><input type="hidden" name="HMAC" /></p>
     <p><input type="hidden" name="OrderId" value=$_GET[OrderId] />
     <p><input type="hidden" name="token" value=$salt:$token></p>
-    <p><input type="submit" /></p>
+    <p><input type="submit" value="Send" /></p>
 </form>
 HTML;
 ?>
