@@ -51,6 +51,7 @@ $_SESSION['keyHmac'] = substr(md5(uniqid(rand(), true)), 0, 16);
  */
 echo <<<HTML
 <script type="text/javascript" src="js\hmac-sha256.js"></script>
+<script type="text/javascript" src="js\jquery-migrate-1.4.1.min.js"></script>
 <script type="text/javascript">
 function send(){
     var amount = document.payment.Amount.value; 
@@ -64,12 +65,23 @@ function send(){
     var HMAC = CryptoJS.HmacSHA256(data , key);
     document.payment.HMAC.value = HMAC;
 }
+
+function getdetails(){
+    $.ajax({
+        type: "GET",
+        url: "ajax\getfee.php",
+    }).done(function( result )
+        {
+            $("#msg").html( result );
+        });
+}
 </script>
 
 <p>Вы получили по телефону SMS с ключом $_SESSION[keyHmac]</p>
 <p>Введите его в поле Key</p>
 <form name="payment" action="result.php" method="post" onsubmit="return send()">
     <p>Amount: <input type="text" name="Amount" required/></p>
+    <div>Коммисия: <p id="msg">1500</p></div>
     <p>Ключ подтверждения: <input type="password" name="Key" required></p>
     <p><input type="hidden" name="HMAC" /></p>
     <p><input type="hidden" name="OrderId" value=$_GET[OrderId] />
