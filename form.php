@@ -66,21 +66,26 @@ function send(){
     document.payment.HMAC.value = HMAC;
 }
 
-function getdetails(){
+function getFeeValue(){
+    var amount = $('input[name=Amount]').val();
+    
     $.ajax({
-        type: "GET",
+        
+        type: "POST",
         url: "ajax/getfee.php",
+        data: {Amount:amount},
     }).done(function( result )
         {
-            $("#msg").html( result );
+            var resultArr = $.parseJSON(result);
+            $("#msg").html(resultArr.result);
         });
 }
 </script>
 
 <p>Вы получили по телефону SMS с ключом $_SESSION[keyHmac]</p>
 <p>Введите его в поле Key</p>
-<form name="payment" action="result.php" method="post" onsubmit="return send()">
-    <p>Amount: <input type="text" name="Amount" onblur="getdetails()" required/></p>
+<form name="payment" action="result.php" method="post" onsubmit="send()">
+    <p>Amount: <input type="text" name="Amount" onblur="getFeeValue()" required/></p>
     <div>Коммисия: <span id="msg">1500</span></div>
     <p>Ключ подтверждения: <input type="password" name="Key" required></p>
     <p><input type="hidden" name="HMAC" /></p>
