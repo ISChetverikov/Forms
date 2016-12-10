@@ -91,7 +91,8 @@ function getFeeValue(){
 }
 </script>
 
-<p>Вы вошли в личный кабинет с паролем, хэш которого <span id="passwordHash">$_SESSION[passwordHash]</span></p>
+<p>Вы вошли в личный кабинет с паролем, хэш которого 
+<span id="passwordHash">$_SESSION[passwordHash]</span></p>
 <p>Вы получили по телефону SMS с ключом $_SESSION[keyHmac]</p>
 <p>Введите его в поле Key</p>
 <form name="payment" action="result.php" method="post" onsubmit="send()">
