@@ -7,7 +7,8 @@
  * CSRF токену на клиенте вычисляется HMAC. Если он совпадает с вычисленным
  * на сервере, то данные считаются не подменнеными.
  * В качестве ключа HMAC выступает имитация хэша пароля, введенным пользователем
- * при авторизации
+ * при авторизации.
+ * Скрпит возвращает данные в формате JSON.
  *
  * PHP version 7
  * 
@@ -28,18 +29,30 @@ session_start();
  */
 function getResult()
 {
-    if (!isset($_SESSION['passwordHash']) && !isset($_SESSION['keyCsrfToken'])) {
+    /*
+     * Проверка наличия переменных сессии
+     */
+    if (!isset($_SESSION['passwordHash']) || !isset($_SESSION['keyCsrfToken'])) {
         $result['isValid'] = false;
         $result['result'] = "Ошибка доступа. Вы не авторизованы.";
         return $result;
     }
     
-    if (!isset($_POST['HMAC']) && !isset($_POST['Amount'])) {
+    /*
+     * Проверка наличия ожидаемых данных
+     */
+    if (!isset($_POST['HMAC']) 
+        || !isset($_POST['Amount']) 
+        || !isset($_POST['Token'])
+    ) {
         $result['isValid'] = false;
-        $result['result'] = "Ошибка доступа. Неполный AJAX запрос.";
+        $result['result'] = "Неполный AJAX запрос.";
         return $result;
     }
     
+    /*
+     * Вычисление HMAC кода для проверка целостности данных
+     */
     $tokenArr = explode(":", $_POST['Token']);
     if (count($tokenArr) != 2) {
         $result['isValid'] = false;
@@ -58,6 +71,10 @@ function getResult()
         return $result;
     }
 
+    /*
+     * Проверка корректности данных.
+     * В случае успеха нахождение величины комиссии.
+     */
     if (Validator::validateAmount($_POST['Amount'])) {
         $result['isValid'] = true;
         $result['result'] = round($_POST['Amount'] * 0.01, 2);
@@ -70,6 +87,9 @@ function getResult()
     }
 }
 
-echo json_encode(getResult());
+/*
+ * Представляем резултат в виде JSON.
+ */
+ echo json_encode(getResult());
 
 ?>
