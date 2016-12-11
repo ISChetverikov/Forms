@@ -6,8 +6,8 @@
  * Для защиты от подмены данных по сумме, введенной пользователем и
  * CSRF токену на клиенте вычисляется HMAC. Если он совпадает с вычисленным
  * на сервере, то данные считаются не подменнеными.
- * В качестве ключа HMAC выступает имитация хэша пароля, введенным пользователем
- * при авторизации.
+ * В качестве ключа HMAC выступает ключ, высланный заранее пользователю по SMS
+ * (например, при его авторизации)
  * Скрпит возвращает данные в формате JSON.
  *
  * PHP version 7
@@ -19,6 +19,8 @@
  * @link     https://github.com/ISChetverikov/Forms
  */
 require_once "../validator.php";
+
+//ini_set('display_errors', 0);
 session_start();
 
 /**
@@ -32,7 +34,7 @@ function getResult()
     /*
      * Проверка наличия переменных сессии
      */
-    if (!isset($_SESSION['passwordHash']) || !isset($_SESSION['keyCsrfToken'])) {
+    if (!isset($_SESSION['keyHmac']) || !isset($_SESSION['keyCsrfToken'])) {
         $result['isValid'] = false;
         $result['result'] = "Ошибка доступа. Вы не авторизованы.";
         return $result;
@@ -63,7 +65,7 @@ function getResult()
     
     $dataHMAC = $_POST['Amount'];
     $dataHMAC.= $salt.":".hash('sha256', $salt.$_SESSION['keyCsrfToken']);
-    $HMAC = hash_hmac('sha256', $dataHMAC, $_SESSION['passwordHash']);
+    $HMAC = hash_hmac('sha256', $dataHMAC, $_SESSION['keyHmac']);
     
     if ($HMAC != $_POST['HMAC']) {
         $result['isValid'] = false;
@@ -90,6 +92,7 @@ function getResult()
 /*
  * Представляем резултат в виде JSON.
  */
- echo json_encode(getResult());
+echo json_encode(getResult());
+
 
 ?>

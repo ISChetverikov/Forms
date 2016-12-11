@@ -46,11 +46,6 @@ $token = hash('sha256', $salt.$_SESSION['keyCsrfToken']);
 $_SESSION['keyHmac'] = substr(md5(uniqid(rand(), true)), 0, 16);
 
 /*
- * Имитация хэша пароля пользователя
- */
-$_SESSION['passwordHash'] = hash('sha256', uniqid(rand(), true));
-
-/*
  * Страница с формой и JavaScript кодом для формирования HMAC на стороне клиента.
  * Введенный ключ подтверждения не передается срерверу
  */
@@ -76,12 +71,12 @@ function getFeeValue(){
     var token = $('input[name=token]').val();
     var data = amount.toString()+token;
     
-    var key = $('#passwordHash').html();
+    var key = $('#keyHmac').html();
     var HMAC = CryptoJS.HmacSHA256(data, key);
     
     $.ajax({
         type: "POST",
-        url: "ajax/getfee.php",
+        url: "testing/intruderAJAX.php",
         data: "Amount="+amount+"&HMAC="+HMAC+"&Token="+token,
     }).done(function( result )
         {
@@ -91,9 +86,8 @@ function getFeeValue(){
 }
 </script>
 
-<p>Вы вошли в личный кабинет с паролем, хэш которого 
-<span id="passwordHash">$_SESSION[passwordHash]</span></p>
-<p>Вы получили по телефону SMS с ключом $_SESSION[keyHmac]</p>
+<p>Вы получили по телефону SMS с ключом 
+<span id="keyHmac">$_SESSION[keyHmac]</span></p>
 <p>Введите его в поле Key</p>
 <form name="payment" action="result.php" method="post" onsubmit="send()">
     <p>Amount: <input type="text" name="Amount" onblur="getFeeValue()" required/></p>
