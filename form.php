@@ -54,15 +54,15 @@ echo <<<HTML
 <script type="text/javascript" src="js\jquery-3.0.0.min.js"></script>
 <script type="text/javascript">
 function send(){
-    var amount = document.payment.Amount.value; 
-    var orderId = document.payment.OrderId.value;
-    var token = document.payment.token.value;
+    var amount = $('input[name=Amount]').val(); 
+    var orderId = $('input[name=OrderId]').val();
+    var token = $('input[name=token]').val();
     var data = amount.toString()+orderId.toString()+token;
     
     var key = $('#keyHmac').html();
     
     var HMAC = CryptoJS.HmacSHA256(data , key);
-    document.payment.HMAC.value = HMAC;
+    $('input[name=HMAC]').val(HMAC);
 }
 
 function getFeeValue(){
@@ -80,7 +80,7 @@ function getFeeValue(){
     }).done(function( result )
         {
             var resultArr = $.parseJSON(result);
-            $("#msg").html(resultArr.result);
+            $("#feeMsg").html(resultArr.result);
         });
 }
 </script>
@@ -89,7 +89,7 @@ function getFeeValue(){
 <span id="keyHmac">$_SESSION[keyHmac]</span></p>
 <form name="payment" action="result.php" method="post" onsubmit="send()">
     <p>Amount: <input type="text" name="Amount" onblur="getFeeValue()" required/></p>
-    <div>Коммисия: <span id="msg">1500</span></div>
+    <div>Коммисия: <span id="feeMsg"></span></div>
     <p><input type="hidden" name="HMAC" /></p>
     <p><input type="hidden" name="OrderId" value=$_GET[OrderId] />
     <p><input type="hidden" name="token" value=$salt:$token></p>
