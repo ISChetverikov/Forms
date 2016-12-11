@@ -46,8 +46,7 @@ $token = hash('sha256', $salt.$_SESSION['keyCsrfToken']);
 $_SESSION['keyHmac'] = substr(md5(uniqid(rand(), true)), 0, 16);
 
 /*
- * Страница с формой и JavaScript кодом для формирования HMAC на стороне клиента.
- * Введенный ключ подтверждения не передается срерверу
+ * Страница с формой и JavaScript кодом для формирования HMAC на стороне клиента
  */
 echo <<<HTML
 <script type="text/javascript" src="js\hmac-sha256.js"></script>
@@ -75,9 +74,9 @@ function getFeeValue(){
     
     $.ajax({
         type: "POST",
-        url: "testing/intruderAJAX.php",
+        url: "ajax/getfee.php",
         data: "Amount="+amount+"&HMAC="+HMAC+"&Token="+token,
-    }).done(function( result )
+    }).done(function(result)
         {
             var resultArr = $.parseJSON(result);
             $("#feeMsg").html(resultArr.result);
