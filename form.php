@@ -1,6 +1,6 @@
 <?php
 /**
- * Форма, необходимая для ввода необходимой суммы, а также ключ подтверждения
+ * Форма, необходимая для ввода необходимой суммы
  * 
  * При обращении к скипту формы необходим GET-параметр OrderId, являющийся 
  * положительным целым числом.
@@ -9,7 +9,7 @@
  * Ключ, используемый для вычисления HMAC, также генерируется сервером.
  * Ключи сохраняются в сессию.
  * Ключ подтверждения выведен на страницу как имитация получения его по SMS,
- * его необходимо ввести в поле Key.
+ * он введен пользователем заранее, например при авторизации.
  *
  * PHP version 7
  * 
@@ -59,8 +59,7 @@ function send(){
     var token = document.payment.token.value;
     var data = amount.toString()+orderId.toString()+token;
     
-    var key = document.payment.Key.value;
-    document.payment.Key.value = "";
+    var key = $('#keyHmac').html();
     
     var HMAC = CryptoJS.HmacSHA256(data , key);
     document.payment.HMAC.value = HMAC;
@@ -86,13 +85,11 @@ function getFeeValue(){
 }
 </script>
 
-<p>Вы получили по телефону SMS с ключом 
+<p>Вы получили при авторизации по телефону SMS с ключом 
 <span id="keyHmac">$_SESSION[keyHmac]</span></p>
-<p>Введите его в поле Key</p>
 <form name="payment" action="result.php" method="post" onsubmit="send()">
     <p>Amount: <input type="text" name="Amount" onblur="getFeeValue()" required/></p>
     <div>Коммисия: <span id="msg">1500</span></div>
-    <p>Ключ подтверждения: <input type="password" name="Key" required></p>
     <p><input type="hidden" name="HMAC" /></p>
     <p><input type="hidden" name="OrderId" value=$_GET[OrderId] />
     <p><input type="hidden" name="token" value=$salt:$token></p>
